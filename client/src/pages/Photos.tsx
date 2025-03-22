@@ -20,12 +20,22 @@ import {
   TabsList,
   TabsTrigger
 } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import PhotoUpload from "@/components/photos/PhotoUpload";
 import PhotoGrid from "@/components/photos/PhotoGrid";
 import CIReferenceGrid from "@/components/photos/CIReferenceGrid";
-import { Filter, SortAsc, Grid, ImageIcon, CloudUpload } from "lucide-react";
+import { Filter, SortAsc, Grid, ImageIcon, CloudUpload, Info } from "lucide-react";
 
 export default function Photos() {
   const [filter, setFilter] = useState("all");
@@ -138,37 +148,68 @@ export default function Photos() {
         <TabsContent value="history" className="mt-0">
           <div className="mb-4 flex justify-between items-center">
             <h2 className="text-lg font-semibold">Your Photos</h2>
-            <Button 
-              onClick={() => document.getElementById('photo-upload-top')?.click()}
-              className="flex items-center"
-            >
-              <CloudUpload className="h-4 w-4 mr-2" />
-              Upload Photo
-            </Button>
-            <input
-              type="file"
-              id="photo-upload-top"
-              className="hidden"
-              accept="image/*"
-              onChange={(e) => {
-                if (e.target.files && e.target.files[0]) {
-                  // Manually forward the file to the PhotoUpload component's file input
-                  const photoUploadInput = document.getElementById('photo-upload') as HTMLInputElement;
-                  if (photoUploadInput) {
-                    // Create a DataTransfer object
-                    const dataTransfer = new DataTransfer();
-                    dataTransfer.items.add(e.target.files[0]);
-                    
-                    // Set the files to the photo-upload input
-                    photoUploadInput.files = dataTransfer.files;
-                    
-                    // Trigger a change event
-                    const event = new Event('change', { bubbles: true });
-                    photoUploadInput.dispatchEvent(event);
+            <div className="flex gap-2">
+              {/* Reference Photos Dialog */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="flex items-center">
+                    <Info className="h-4 w-4 mr-2" />
+                    View CI Reference Photos
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Coverage Index (CI) Reference Guide</DialogTitle>
+                    <DialogDescription>
+                      Compare your photos to these reference levels to track your progress on the Coverage Index (CI) scale from CI-0 (tightly circumcised) to CI-10 (fully restored).
+                    </DialogDescription>
+                  </DialogHeader>
+                  
+                  <div className="py-4">
+                    <CIReferenceGrid />
+                  </div>
+                  
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="secondary">Close</Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+              
+              {/* Upload Button */}
+              <Button 
+                onClick={() => document.getElementById('photo-upload-top')?.click()}
+                className="flex items-center"
+              >
+                <CloudUpload className="h-4 w-4 mr-2" />
+                Upload Photo
+              </Button>
+              <input
+                type="file"
+                id="photo-upload-top"
+                className="hidden"
+                accept="image/*"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    // Manually forward the file to the PhotoUpload component's file input
+                    const photoUploadInput = document.getElementById('photo-upload') as HTMLInputElement;
+                    if (photoUploadInput) {
+                      // Create a DataTransfer object
+                      const dataTransfer = new DataTransfer();
+                      dataTransfer.items.add(e.target.files[0]);
+                      
+                      // Set the files to the photo-upload input
+                      photoUploadInput.files = dataTransfer.files;
+                      
+                      // Trigger a change event
+                      const event = new Event('change', { bubbles: true });
+                      photoUploadInput.dispatchEvent(event);
+                    }
                   }
-                }
-              }}
-            />
+                }}
+              />
+            </div>
           </div>
 
           {/* Photo upload component only in the history tab */}
