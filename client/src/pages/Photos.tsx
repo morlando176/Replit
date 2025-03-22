@@ -3,7 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { 
   Card, 
-  CardContent 
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription 
 } from "@/components/ui/card";
 import { 
   DropdownMenu,
@@ -12,21 +15,22 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger
+} from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import PhotoUpload from "@/components/photos/PhotoUpload";
 import PhotoGrid from "@/components/photos/PhotoGrid";
-import { Filter, SortAsc, MoreVertical } from "lucide-react";
+import CIReferenceGrid from "@/components/photos/CIReferenceGrid";
+import { Filter, SortAsc, Grid, ImageIcon } from "lucide-react";
 
 export default function Photos() {
   const [filter, setFilter] = useState("all");
   const [sort, setSort] = useState("newest");
+  const [activeTab, setActiveTab] = useState("history");
   
   // Default to user ID 1 for prototype
   const userId = 1;
@@ -71,93 +75,120 @@ export default function Photos() {
       
       <PhotoUpload userId={userId} currentCiLevel={user?.ciLevel || 0} />
       
-      <div>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-neutral-800">Photo History</h2>
+          <TabsList>
+            <TabsTrigger value="history" className="flex items-center">
+              <ImageIcon className="h-4 w-4 mr-2" />
+              Your Photos
+            </TabsTrigger>
+            <TabsTrigger value="reference" className="flex items-center">
+              <Grid className="h-4 w-4 mr-2" />
+              CI Reference Guide
+            </TabsTrigger>
+          </TabsList>
           
-          <div className="flex space-x-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="flex items-center">
-                  <Filter className="h-4 w-4 mr-2" />
-                  Filter
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setFilter("all")}>
-                  All CI Levels
-                </DropdownMenuItem>
-                <DropdownMenuItem disabled>By CI Level</DropdownMenuItem>
-                {ciLevelOptions.map(option => (
-                  <DropdownMenuItem 
-                    key={option.value} 
-                    className="pl-6"
-                    onClick={() => setFilter(option.value)}
-                  >
-                    {option.label}
+          {activeTab === "history" && (
+            <div className="flex space-x-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="flex items-center">
+                    <Filter className="h-4 w-4 mr-2" />
+                    Filter
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setFilter("all")}>
+                    All CI Levels
                   </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-            
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="flex items-center">
-                  <SortAsc className="h-4 w-4 mr-2" />
-                  Sort
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setSort("newest")}>
-                  Newest First
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSort("oldest")}>
-                  Oldest First
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSort("ciLevel")}>
-                  By CI Level
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+                  <DropdownMenuItem disabled>By CI Level</DropdownMenuItem>
+                  {ciLevelOptions.map(option => (
+                    <DropdownMenuItem 
+                      key={option.value} 
+                      className="pl-6"
+                      onClick={() => setFilter(option.value)}
+                    >
+                      {option.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="flex items-center">
+                    <SortAsc className="h-4 w-4 mr-2" />
+                    Sort
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setSort("newest")}>
+                    Newest First
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSort("oldest")}>
+                    Oldest First
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSort("ciLevel")}>
+                    By CI Level
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
         </div>
         
-        {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[...Array(3)].map((_, i) => (
-              <Card key={i}>
-                <Skeleton className="aspect-[4/3] w-full" />
-                <CardContent className="p-3">
-                  <div className="flex justify-between items-center">
-                    <Skeleton className="h-4 w-20" />
-                    <Skeleton className="h-4 w-10" />
-                  </div>
-                  <Skeleton className="h-3 w-12 mt-1" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <PhotoGrid photos={sortedPhotos} userId={userId} />
-        )}
+        <TabsContent value="history" className="mt-0">
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[...Array(3)].map((_, i) => (
+                <Card key={i}>
+                  <Skeleton className="aspect-[4/3] w-full" />
+                  <CardContent className="p-3">
+                    <div className="flex justify-between items-center">
+                      <Skeleton className="h-4 w-20" />
+                      <Skeleton className="h-4 w-10" />
+                    </div>
+                    <Skeleton className="h-3 w-12 mt-1" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <PhotoGrid photos={sortedPhotos} userId={userId} />
+          )}
+          
+          {sortedPhotos && sortedPhotos.length === 0 && !isLoading && (
+            <Card>
+              <CardContent className="py-8 text-center">
+                <p className="text-neutral-500">No photos found</p>
+                {filter !== "all" && (
+                  <Button 
+                    variant="link" 
+                    onClick={() => setFilter("all")}
+                    className="mt-2"
+                  >
+                    Clear filter
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
         
-        {sortedPhotos && sortedPhotos.length === 0 && !isLoading && (
+        <TabsContent value="reference" className="mt-0">
           <Card>
-            <CardContent className="py-8 text-center">
-              <p className="text-neutral-500">No photos found</p>
-              {filter !== "all" && (
-                <Button 
-                  variant="link" 
-                  onClick={() => setFilter("all")}
-                  className="mt-2"
-                >
-                  Clear filter
-                </Button>
-              )}
+            <CardHeader>
+              <CardTitle>Coverage Index (CI) Reference Guide</CardTitle>
+              <CardDescription>
+                The Coverage Index (CI) is a standardized scale used to measure foreskin restoration progress from CI-0 (tightly circumcised) to CI-10 (fully restored).
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CIReferenceGrid />
             </CardContent>
           </Card>
-        )}
-      </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
