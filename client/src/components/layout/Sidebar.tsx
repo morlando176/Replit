@@ -40,7 +40,9 @@ export default function Sidebar({ currentRoute, onNavigate }: SidebarProps) {
               <a 
                 href={item.href}
                 onClick={(e) => {
+                  e.preventDefault();
                   console.log('Sidebar link clicked:', item.href);
+                  onNavigate(item.href);
                 }}
               >
                 <div
