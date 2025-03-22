@@ -129,6 +129,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }));
 
   // Photo routes
+  app.get("/api/photos", async (req, res) => {
+    // Default to user 1 for single-user prototype
+    const photos = await storage.getPhotos(1);
+    res.json(photos);
+  });
+  
   app.get("/api/photos/:userId", async (req, res) => {
     const userId = parseInt(req.params.userId);
     const photos = await storage.getPhotos(userId);
