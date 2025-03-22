@@ -131,7 +131,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Photo routes
   app.get("/api/photos", async (req, res) => {
     // Default to user 1 for single-user prototype
-    const photos = await storage.getPhotos(1);
+    // Only return non-reference photos by default
+    const photos = await storage.getPhotos(1, false);
     res.json(photos);
   });
   
@@ -143,6 +144,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   app.get("/api/reference-photos", async (req, res) => {
+    // This endpoint is specifically for reference photos
     const photos = await storage.getReferencePhotos();
     res.json(photos);
   });
