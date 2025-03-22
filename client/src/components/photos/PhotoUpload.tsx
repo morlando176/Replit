@@ -22,22 +22,31 @@ export default function PhotoUpload({ userId, currentCiLevel }: PhotoUploadProps
   const { toast } = useToast();
   
   const { data: user } = useQuery({
-    queryKey: ['/api/user/1']
+    queryKey: ['/api/user', userId],
+    // Ensure the query properly typecasts the response
+    select: (data) => data as { id: number; startDate?: string; ciLevel?: number }
   });
   
   const uploadMutation = useMutation({
     mutationFn: async (formData: FormData) => {
-      const response = await fetch('/api/photos', {
-        method: 'POST',
-        body: formData,
-        credentials: 'include'
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to upload photo');
+      try {
+        const response = await fetch('/api/photos', {
+          method: 'POST',
+          body: formData,
+          credentials: 'include'
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Upload error:', errorData);
+          throw new Error(errorData.message || 'Failed to upload photo');
+        }
+        
+        return response.json();
+      } catch (error) {
+        console.error('Photo upload error:', error);
+        throw error;
       }
-      
-      return response.json();
     },
     onSuccess: () => {
       setFile(null);

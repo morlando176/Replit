@@ -140,17 +140,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(400).json({ message: "No photo uploaded" });
     }
     
-    const photoData = insertPhotoSchema.parse({
-      ...req.body,
-      userId: parseInt(req.body.userId),
-      date: new Date(req.body.date),
-      filename: req.file.filename,
-      ciLevel: req.body.ciLevel ? parseInt(req.body.ciLevel) : undefined,
-      day: req.body.day ? parseInt(req.body.day) : undefined
-    });
-    
-    const photo = await storage.createPhoto(photoData);
-    res.status(201).json(photo);
+    try {
+      // Convert form data to appropriate types
+      const photoData = insertPhotoSchema.parse({
+        ...req.body,
+        userId: parseInt(req.body.userId),
+        date: req.body.date ? new Date(req.body.date) : new Date(),
+        filename: req.file.filename,
+        ciLevel: req.body.ciLevel ? parseInt(req.body.ciLevel) : null,
+        day: req.body.day ? parseInt(req.body.day) : null,
+        notes: req.body.notes || null
+      });
+      console.log('Parsed photo data:', photoData);
+      
+      const photo = await storage.createPhoto(photoData);
+      res.status(201).json(photo);
+    } catch (error) {
+      console.error('Error processing photo upload:', error);
+      res.status(400).json({ message: 'Failed to process photo data', error: String(error) });
+    }
   }));
 
   app.delete("/api/photos/:id", async (req, res) => {
