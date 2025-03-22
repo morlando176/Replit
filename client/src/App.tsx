@@ -15,7 +15,15 @@ import Sidebar from "@/components/layout/Sidebar";
 import MobileNav from "@/components/layout/MobileNav";
 
 function Router() {
+  // Default to tracking if no hash is specified, or use the current hash
   const [currentRoute, setCurrentRoute] = useState(window.location.hash || '#tracking');
+  
+  // Set initial hash to tracking if no hash is specified
+  useEffect(() => {
+    if (!window.location.hash) {
+      window.location.hash = '#tracking';
+    }
+  }, []);
 
   useEffect(() => {
     const hashChangeHandler = () => {
@@ -35,14 +43,15 @@ function Router() {
       <div className="main-content flex-1">
         <div className="p-4 lg:p-8 pb-20 lg:pb-8">
           <Switch>
-            <Route path="/#dashboard" component={Dashboard} />
-            <Route path="/#profile" component={Profile} />
-            <Route path="/#photos" component={Photos} />
-            <Route path="/#tracking" component={Tracking} />
-            <Route path="/#analysis" component={Analysis} />
             <Route path="/" component={Tracking} />
-            {/* Fallback to 404 */}
-            <Route component={NotFound} />
+            {/* Use specific logic for hash-based navigation */}
+            {currentRoute === '#dashboard' && <Dashboard />}
+            {currentRoute === '#profile' && <Profile />}
+            {currentRoute === '#photos' && <Photos />}
+            {currentRoute === '#tracking' && <Tracking />}
+            {currentRoute === '#analysis' && <Analysis />}
+            {!['#dashboard', '#profile', '#photos', '#tracking', '#analysis', ''].includes(currentRoute) && 
+              <NotFound />}
           </Switch>
         </div>
       </div>

@@ -37,8 +37,8 @@ export default function Sidebar({ currentRoute }: SidebarProps) {
           {navItems.map((item) => (
             <li key={item.href}>
               <Link href={item.href}>
-                <a 
-                  className={`flex items-center p-2 rounded-lg font-medium transition-colors ${
+                <div
+                  className={`flex items-center p-2 rounded-lg font-medium transition-colors cursor-pointer ${
                     isActive(item.href) 
                       ? "bg-primary-50 text-primary-600" 
                       : "text-neutral-800 hover:bg-primary-50 hover:text-primary-600"
@@ -46,7 +46,7 @@ export default function Sidebar({ currentRoute }: SidebarProps) {
                 >
                   {item.icon}
                   {item.label}
-                </a>
+                </div>
               </Link>
             </li>
           ))}
