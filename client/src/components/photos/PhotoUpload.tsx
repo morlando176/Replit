@@ -227,7 +227,7 @@ export default function PhotoUpload({ userId, currentCiLevel }: PhotoUploadProps
                     disabled={uploadMutation.isPending}
                   >
                     <ImagePlus className="h-4 w-4 mr-2" />
-                    Choose Reference
+                    View Reference Photos
                   </Button>
                   
                   <Button 
@@ -318,7 +318,7 @@ export default function PhotoUpload({ userId, currentCiLevel }: PhotoUploadProps
                   }}
                 >
                   <ImagePlus className="h-4 w-4 mr-2" />
-                  Select from References
+                  Compare with References
                 </Button>
               </div>
             </div>
