@@ -137,7 +137,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.get("/api/photos/:userId", async (req, res) => {
     const userId = parseInt(req.params.userId);
-    const photos = await storage.getPhotos(userId);
+    const isReference = req.query.reference === 'true';
+    const photos = await storage.getPhotos(userId, isReference);
+    res.json(photos);
+  });
+  
+  app.get("/api/reference-photos", async (req, res) => {
+    const photos = await storage.getReferencePhotos();
     res.json(photos);
   });
 
@@ -155,7 +161,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         filename: req.file.filename,
         ciLevel: req.body.ciLevel ? parseInt(req.body.ciLevel) : null,
         day: req.body.day ? parseInt(req.body.day) : null,
-        notes: req.body.notes || null
+        notes: req.body.notes || null,
+        isReference: req.body.isReference === 'true'
       });
       console.log('Parsed photo data:', photoData);
       

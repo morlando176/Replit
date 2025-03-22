@@ -45,8 +45,16 @@ export default function Photos() {
   // Default to user ID 1 for prototype
   const userId = 1;
   
-  const { data: photos, isLoading } = useQuery({
-    queryKey: ['/api/photos', userId]
+  const { data: userPhotos, isLoading: isLoadingUserPhotos } = useQuery({
+    queryKey: ['/api/photos', userId],
+    // Ensure the query properly typecasts the response
+    select: (data) => data as any[]
+  });
+  
+  const { data: referencePhotos, isLoading: isLoadingReferencePhotos } = useQuery({
+    queryKey: ['/api/reference-photos'],
+    // Ensure the query properly typecasts the response
+    select: (data) => data as any[]
   });
   
   const { data: user } = useQuery({
@@ -56,13 +64,13 @@ export default function Photos() {
   });
   
   // Filter photos based on CI level
-  const filteredPhotos = !photos ? [] : 
+  const filteredUserPhotos = !userPhotos ? [] : 
     filter === "all" 
-      ? photos 
-      : photos.filter((photo: any) => photo.ciLevel === parseInt(filter));
+      ? userPhotos 
+      : userPhotos.filter((photo: any) => photo.ciLevel === parseInt(filter));
   
   // Sort photos
-  const sortedPhotos = [...filteredPhotos].sort((a: any, b: any) => {
+  const sortedUserPhotos = [...filteredUserPhotos].sort((a: any, b: any) => {
     if (sort === "newest") {
       return new Date(b.date).getTime() - new Date(a.date).getTime();
     } else if (sort === "oldest") {

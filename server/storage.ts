@@ -122,10 +122,16 @@ export class MemStorage implements IStorage {
   }
 
   // Photo methods
-  async getPhotos(userId: number): Promise<Photo[]> {
+  async getPhotos(userId: number, isReference: boolean = false): Promise<Photo[]> {
     return Array.from(this.photos.values())
-      .filter(photo => photo.userId === userId)
+      .filter(photo => photo.userId === userId && photo.isReference === isReference)
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }
+  
+  async getReferencePhotos(): Promise<Photo[]> {
+    return Array.from(this.photos.values())
+      .filter(photo => photo.isReference === true)
+      .sort((a, b) => (a.ciLevel || 0) - (b.ciLevel || 0));
   }
 
   async createPhoto(photo: InsertPhoto): Promise<Photo> {

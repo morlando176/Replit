@@ -41,6 +41,7 @@ export const photos = pgTable("photos", {
   ciLevel: integer("ci_level"),
   day: integer("day"), // Day number in restoration journey
   notes: text("notes"),
+  isReference: boolean("is_reference").default(false), // Flag to indicate if this is a reference photo
 });
 
 // Insert Schemas
