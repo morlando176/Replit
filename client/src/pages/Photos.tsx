@@ -28,12 +28,17 @@ export default function Photos() {
   const [filter, setFilter] = useState("all");
   const [sort, setSort] = useState("newest");
   
+  // Default to user ID 1 for prototype
+  const userId = 1;
+  
   const { data: photos, isLoading } = useQuery({
-    queryKey: ['/api/photos/1']
+    queryKey: ['/api/photos', userId]
   });
   
   const { data: user } = useQuery({
-    queryKey: ['/api/user/1']
+    queryKey: ['/api/user', userId],
+    // Ensure the query properly typecasts the response
+    select: (data) => data as { id: number; ciLevel?: number; startDate?: string }
   });
   
   // Filter photos based on CI level
@@ -64,7 +69,7 @@ export default function Photos() {
     <div>
       <h1 className="text-2xl font-bold text-neutral-800 mb-6">Progress Photos</h1>
       
-      <PhotoUpload userId={1} currentCiLevel={user?.ciLevel || 0} />
+      <PhotoUpload userId={userId} currentCiLevel={user?.ciLevel || 0} />
       
       <div>
         <div className="flex justify-between items-center mb-4">
@@ -133,7 +138,7 @@ export default function Photos() {
             ))}
           </div>
         ) : (
-          <PhotoGrid photos={sortedPhotos} />
+          <PhotoGrid photos={sortedPhotos} userId={userId} />
         )}
         
         {sortedPhotos && sortedPhotos.length === 0 && !isLoading && (

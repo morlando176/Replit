@@ -38,9 +38,10 @@ interface Photo {
 
 interface PhotoGridProps {
   photos: Photo[];
+  userId: number;
 }
 
-export default function PhotoGrid({ photos }: PhotoGridProps) {
+export default function PhotoGrid({ photos, userId }: PhotoGridProps) {
   const [photoToDelete, setPhotoToDelete] = useState<number | null>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
   const { toast } = useToast();
@@ -50,7 +51,8 @@ export default function PhotoGrid({ photos }: PhotoGridProps) {
       return apiRequest('DELETE', `/api/photos/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/photos/1'] });
+      // Use the correct user ID for invalidation
+      queryClient.invalidateQueries({ queryKey: ['/api/photos', userId] });
       toast({
         title: "Photo Deleted",
         description: "The photo has been removed from your collection.",

@@ -50,7 +50,8 @@ export default function PhotoUpload({ userId, currentCiLevel }: PhotoUploadProps
     },
     onSuccess: () => {
       setFile(null);
-      queryClient.invalidateQueries({ queryKey: ['/api/photos/1'] });
+      // Use the correct user ID for invalidation
+      queryClient.invalidateQueries({ queryKey: ['/api/photos', userId] });
       toast({
         title: "Photo Uploaded",
         description: "Your progress photo has been successfully uploaded.",
