@@ -178,7 +178,10 @@ export default function PhotoUpload({ userId, currentCiLevel }: PhotoUploadProps
 
   return (
     <>
-      <CIReferenceGrid onSelectReference={showReferences ? handleSelectReference : undefined} />
+      {/* Only show CIReferenceGrid when in reference selection mode */}
+      {showReferences && (
+        <CIReferenceGrid onSelectReference={handleSelectReference} />
+      )}
       
       <Card className="mb-6">
         <CardContent className="p-6">
@@ -270,13 +273,12 @@ export default function PhotoUpload({ userId, currentCiLevel }: PhotoUploadProps
             <AlertDialogDescription>
               {suggestedCiLevel !== null ? (
                 <>
-                  <p className="mb-2">
-                    Based on our analysis, this photo appears to match CI-{suggestedCiLevel}.
-                  </p>
-                  <p>You can accept this suggestion or choose a different level.</p>
+                  Based on our analysis, this photo appears to match CI-{suggestedCiLevel}.
+                  <br /><br />
+                  You can accept this suggestion or choose a different level.
                 </>
               ) : (
-                <p>Please confirm the Coverage Index level for this photo.</p>
+                <>Please confirm the Coverage Index level for this photo.</>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
