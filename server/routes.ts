@@ -145,7 +145,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const photoData = insertPhotoSchema.parse({
         ...req.body,
         userId: parseInt(req.body.userId),
-        date: req.body.date ? new Date(req.body.date) : new Date(),
+        date: req.body.date || new Date().toISOString(),
         filename: req.file.filename,
         ciLevel: req.body.ciLevel ? parseInt(req.body.ciLevel) : null,
         day: req.body.day ? parseInt(req.body.day) : null,
