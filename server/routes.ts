@@ -170,6 +170,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.sendFile(path.join(uploadsDir, filename));
   });
 
+  // Add a root route in development mode just to avoid 404s
+  app.get("/", (req, res, next) => {
+    // Only intercept if not handled by Vite already
+    if (!res.headersSent) {
+      res.json({ message: "API is running" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

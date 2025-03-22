@@ -15,11 +15,11 @@ export default function MobileNav({ currentRoute }: MobileNavProps) {
   const isActive = (route: string) => currentRoute === route;
   
   const navItems = [
-    { href: "#dashboard", label: "Home", icon: <Home className="h-6 w-6" /> },
-    { href: "#profile", label: "Profile", icon: <User className="h-6 w-6" /> },
-    { href: "#photos", label: "Photos", icon: <ImageIcon className="h-6 w-6" /> },
-    { href: "#tracking", label: "Track", icon: <Calendar className="h-6 w-6" /> },
-    { href: "#analysis", label: "Analysis", icon: <BarChart3 className="h-6 w-6" /> },
+    { href: "/dashboard", label: "Home", icon: <Home className="h-6 w-6" /> },
+    { href: "/profile", label: "Profile", icon: <User className="h-6 w-6" /> },
+    { href: "/photos", label: "Photos", icon: <ImageIcon className="h-6 w-6" /> },
+    { href: "/tracking", label: "Track", icon: <Calendar className="h-6 w-6" /> },
+    { href: "/analysis", label: "Analysis", icon: <BarChart3 className="h-6 w-6" /> },
   ];
   
   return (

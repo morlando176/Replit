@@ -16,11 +16,11 @@ export default function Sidebar({ currentRoute }: SidebarProps) {
   const isActive = (route: string) => currentRoute === route;
   
   const navItems = [
-    { href: "#dashboard", label: "Dashboard", icon: <Home className="h-5 w-5 mr-3" /> },
-    { href: "#profile", label: "Profile", icon: <User className="h-5 w-5 mr-3" /> },
-    { href: "#photos", label: "Photos", icon: <ImageIcon className="h-5 w-5 mr-3" /> },
-    { href: "#tracking", label: "Daily Tracking", icon: <Calendar className="h-5 w-5 mr-3" /> },
-    { href: "#analysis", label: "Analysis", icon: <BarChart3 className="h-5 w-5 mr-3" /> },
+    { href: "/dashboard", label: "Dashboard", icon: <Home className="h-5 w-5 mr-3" /> },
+    { href: "/profile", label: "Profile", icon: <User className="h-5 w-5 mr-3" /> },
+    { href: "/photos", label: "Photos", icon: <ImageIcon className="h-5 w-5 mr-3" /> },
+    { href: "/tracking", label: "Daily Tracking", icon: <Calendar className="h-5 w-5 mr-3" /> },
+    { href: "/analysis", label: "Analysis", icon: <BarChart3 className="h-5 w-5 mr-3" /> },
   ];
   
   return (
