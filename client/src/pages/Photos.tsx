@@ -73,8 +73,6 @@ export default function Photos() {
     <div>
       <h1 className="text-2xl font-bold text-neutral-800 mb-6">Progress Photos</h1>
       
-      <PhotoUpload userId={userId} currentCiLevel={user?.ciLevel || 0} />
-      
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
         <div className="flex justify-between items-center mb-4">
           <TabsList>
@@ -138,6 +136,9 @@ export default function Photos() {
         </div>
         
         <TabsContent value="history" className="mt-0">
+          {/* Photo upload component only in the history tab */}
+          <PhotoUpload userId={userId} currentCiLevel={user?.ciLevel || 0} />
+
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {[...Array(3)].map((_, i) => (
