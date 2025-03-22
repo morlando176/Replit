@@ -25,7 +25,13 @@ export default function MobileNav({ currentRoute }: MobileNavProps) {
   return (
     <nav className="mobile-nav fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 flex lg:hidden z-50">
       {navItems.map((item) => (
-        <Link key={item.href} href={item.href}>
+        <a 
+          key={item.href} 
+          href={item.href}
+          onClick={(e) => {
+            console.log('Mobile nav link clicked:', item.href);
+          }}
+        >
           <div 
             className={`flex flex-col items-center justify-center flex-1 py-3 cursor-pointer ${
               isActive(item.href) ? "text-primary-600" : "text-neutral-500 hover:text-primary-600"
@@ -34,7 +40,7 @@ export default function MobileNav({ currentRoute }: MobileNavProps) {
             {item.icon}
             <span className="text-xs mt-1">{item.label}</span>
           </div>
-        </Link>
+        </a>
       ))}
     </nav>
   );

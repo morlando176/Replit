@@ -10,9 +10,10 @@ import UserAvatar from "@/components/ui/user-avatar";
 
 interface SidebarProps {
   currentRoute: string;
+  onNavigate: (page: string) => void;
 }
 
-export default function Sidebar({ currentRoute }: SidebarProps) {
+export default function Sidebar({ currentRoute, onNavigate }: SidebarProps) {
   const isActive = (route: string) => currentRoute === route;
   
   const navItems = [
@@ -36,7 +37,12 @@ export default function Sidebar({ currentRoute }: SidebarProps) {
         <ul className="space-y-2">
           {navItems.map((item) => (
             <li key={item.href}>
-              <Link href={item.href}>
+              <a 
+                href={item.href}
+                onClick={(e) => {
+                  console.log('Sidebar link clicked:', item.href);
+                }}
+              >
                 <div
                   className={`flex items-center p-2 rounded-lg font-medium transition-colors cursor-pointer ${
                     isActive(item.href) 
@@ -47,7 +53,7 @@ export default function Sidebar({ currentRoute }: SidebarProps) {
                   {item.icon}
                   {item.label}
                 </div>
-              </Link>
+              </a>
             </li>
           ))}
         </ul>
