@@ -25,7 +25,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import PhotoUpload from "@/components/photos/PhotoUpload";
 import PhotoGrid from "@/components/photos/PhotoGrid";
 import CIReferenceGrid from "@/components/photos/CIReferenceGrid";
-import { Filter, SortAsc, Grid, ImageIcon } from "lucide-react";
+import { Filter, SortAsc, Grid, ImageIcon, CloudUpload } from "lucide-react";
 
 export default function Photos() {
   const [filter, setFilter] = useState("all");
@@ -136,6 +136,41 @@ export default function Photos() {
         </div>
         
         <TabsContent value="history" className="mt-0">
+          <div className="mb-4 flex justify-between items-center">
+            <h2 className="text-lg font-semibold">Your Photos</h2>
+            <Button 
+              onClick={() => document.getElementById('photo-upload-top')?.click()}
+              className="flex items-center"
+            >
+              <CloudUpload className="h-4 w-4 mr-2" />
+              Upload Photo
+            </Button>
+            <input
+              type="file"
+              id="photo-upload-top"
+              className="hidden"
+              accept="image/*"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  // Manually forward the file to the PhotoUpload component's file input
+                  const photoUploadInput = document.getElementById('photo-upload') as HTMLInputElement;
+                  if (photoUploadInput) {
+                    // Create a DataTransfer object
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(e.target.files[0]);
+                    
+                    // Set the files to the photo-upload input
+                    photoUploadInput.files = dataTransfer.files;
+                    
+                    // Trigger a change event
+                    const event = new Event('change', { bubbles: true });
+                    photoUploadInput.dispatchEvent(event);
+                  }
+                }
+              }}
+            />
+          </div>
+
           {/* Photo upload component only in the history tab */}
           <PhotoUpload userId={userId} currentCiLevel={user?.ciLevel || 0} />
 
@@ -177,6 +212,23 @@ export default function Photos() {
         </TabsContent>
         
         <TabsContent value="reference" className="mt-0">
+          <div className="mb-4 flex justify-between items-center">
+            <h2 className="text-lg font-semibold">CI Reference Guide</h2>
+            <Button 
+              onClick={() => {
+                // Switch to Your Photos tab and then trigger the upload
+                setActiveTab("history");
+                setTimeout(() => {
+                  document.getElementById('photo-upload')?.click();
+                }, 100);
+              }}
+              className="flex items-center"
+            >
+              <CloudUpload className="h-4 w-4 mr-2" />
+              Upload Photo
+            </Button>
+          </div>
+          
           <Card>
             <CardHeader>
               <CardTitle>Coverage Index (CI) Reference Guide</CardTitle>
