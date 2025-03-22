@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
 import { format } from "date-fns";
 import { 
   Card, 
@@ -32,10 +33,11 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { apiRequest } from "@/lib/queryClient";
 import PhotoUpload from "@/components/photos/PhotoUpload";
 import PhotoGrid from "@/components/photos/PhotoGrid";
 import CIReferenceGrid from "@/components/photos/CIReferenceGrid";
-import { Filter, SortAsc, Grid, ImageIcon, CloudUpload, Info } from "lucide-react";
+import { Filter, SortAsc, Grid, ImageIcon, CloudUpload, Info, Upload } from "lucide-react";
 
 export default function Photos() {
   const [filter, setFilter] = useState("all");
@@ -63,6 +65,31 @@ export default function Photos() {
     select: (data) => data as { id: number; ciLevel?: number; startDate?: string }
   });
   
+  // Upload reference photo mutation
+  const uploadReferenceMutation = useMutation({
+    mutationFn: async (formData: FormData) => {
+      // Add isReference flag
+      formData.append('isReference', 'true');
+      
+      // Use fetch directly since apiRequest doesn't support FormData
+      const response = await fetch('/api/photos', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to upload reference photo');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/reference-photos'] });
+    }
+  });
+  
   // Filter photos based on CI level
   const filteredUserPhotos = !userPhotos ? [] : 
     filter === "all" 
@@ -70,7 +97,7 @@ export default function Photos() {
       : userPhotos.filter((photo: any) => photo.ciLevel === parseInt(filter));
   
   // Sort photos
-  const sortedUserPhotos = [...filteredUserPhotos].sort((a: any, b: any) => {
+  const sortedUserPhotos = filteredUserPhotos ? [...filteredUserPhotos].sort((a: any, b: any) => {
     if (sort === "newest") {
       return new Date(b.date).getTime() - new Date(a.date).getTime();
     } else if (sort === "oldest") {
@@ -79,13 +106,27 @@ export default function Photos() {
       return (b.ciLevel || 0) - (a.ciLevel || 0);
     }
     return 0;
-  });
+  }) : [];
   
   // Generate CI level options for filtering
   const ciLevelOptions = Array.from({ length: 11 }, (_, i) => ({
     value: i.toString(),
     label: `CI-${i}`
   }));
+  
+  // Handle reference photo upload
+  const handleReferencePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      const formData = new FormData();
+      formData.append('photo', file);
+      formData.append('userId', userId.toString());
+      formData.append('date', new Date().toISOString());
+      formData.append('ciLevel', '1'); // Default to CI-1, can be changed later
+      
+      uploadReferenceMutation.mutate(formData);
+    }
+  };
   
   return (
     <div>
@@ -185,13 +226,14 @@ export default function Photos() {
                 </DialogContent>
               </Dialog>
               
-              {/* Upload Button */}
+              {/* Upload User Photo Button */}
               <Button 
                 onClick={() => document.getElementById('photo-upload-top')?.click()}
                 className="flex items-center"
+                variant="default"
               >
                 <CloudUpload className="h-4 w-4 mr-2" />
-                Upload Photo
+                Upload Your Photo
               </Button>
               <input
                 type="file"
@@ -223,7 +265,7 @@ export default function Photos() {
           {/* Photo upload component only in the history tab */}
           <PhotoUpload userId={userId} currentCiLevel={user?.ciLevel || 0} />
 
-          {isLoading ? (
+          {isLoadingUserPhotos ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {[...Array(3)].map((_, i) => (
                 <Card key={i}>
@@ -239,10 +281,10 @@ export default function Photos() {
               ))}
             </div>
           ) : (
-            <PhotoGrid photos={sortedPhotos} userId={userId} />
+            <PhotoGrid photos={sortedUserPhotos} userId={userId} />
           )}
           
-          {sortedPhotos && sortedPhotos.length === 0 && !isLoading && (
+          {sortedUserPhotos && sortedUserPhotos.length === 0 && !isLoadingUserPhotos && (
             <Card>
               <CardContent className="py-8 text-center">
                 <p className="text-neutral-500">No photos found</p>
@@ -264,18 +306,20 @@ export default function Photos() {
           <div className="mb-4 flex justify-between items-center">
             <h2 className="text-lg font-semibold">CI Reference Guide</h2>
             <Button 
-              onClick={() => {
-                // Switch to Your Photos tab and then trigger the upload
-                setActiveTab("history");
-                setTimeout(() => {
-                  document.getElementById('photo-upload')?.click();
-                }, 100);
-              }}
+              onClick={() => document.getElementById('reference-photo-upload')?.click()}
               className="flex items-center"
+              variant="outline"
             >
-              <CloudUpload className="h-4 w-4 mr-2" />
-              Upload Photo
+              <Upload className="h-4 w-4 mr-2" />
+              Upload Reference Photo
             </Button>
+            <input
+              type="file"
+              id="reference-photo-upload"
+              className="hidden"
+              accept="image/*"
+              onChange={handleReferencePhotoUpload}
+            />
           </div>
           
           <Card>

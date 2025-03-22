@@ -150,6 +150,7 @@ export default function PhotoUpload({ userId, currentCiLevel }: PhotoUploadProps
     formData.append('userId', userId.toString());
     formData.append('date', new Date().toISOString());
     formData.append('ciLevel', selectedCiLevel.toString());
+    formData.append('isReference', 'false'); // Explicitly mark as non-reference photo
     
     // Calculate days since start date if available
     if (user?.startDate) {
