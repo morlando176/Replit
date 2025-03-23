@@ -56,10 +56,18 @@ export default function TrackingCalendar({
   // Helper to find entry for a specific date
   const findEntryForDate = (date: Date) => {
     const dateString = format(date, 'yyyy-MM-dd');
-    return entries.find(entry => {
+    // Log entries for debugging
+    console.log('Looking for entry on date:', dateString, 'in entries:', entries);
+    
+    const entry = entries.find(entry => {
       const entryDate = new Date(entry.date);
-      return format(entryDate, 'yyyy-MM-dd') === dateString;
+      const formattedEntryDate = format(entryDate, 'yyyy-MM-dd');
+      console.log('Comparing dates:', formattedEntryDate, dateString, formattedEntryDate === dateString);
+      return formattedEntryDate === dateString;
     });
+    
+    console.log('Found entry:', entry);
+    return entry;
   };
   
   // Get status dot color for a date
