@@ -3,12 +3,26 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Home, ArrowRight, Calendar, Image as ImageIcon, BarChart3 } from "lucide-react";
-import { Link } from "wouter";
+
+interface User {
+  id: number;
+  name: string | null;
+  ciLevel: number | null;
+  targetCi: number | null;
+  startDate: string | null;
+  [key: string]: any;
+}
 
 export default function Dashboard() {
-  const { data: user, isLoading: isLoadingUser } = useQuery({
+  const { data: user, isLoading: isLoadingUser } = useQuery<User>({
     queryKey: ['/api/user/1']
   });
+  
+  // Function to handle navigation
+  const navigateTo = (path: string) => {
+    // Get the window's hash router
+    window.location.hash = path;
+  };
 
   return (
     <div>
@@ -31,11 +45,14 @@ export default function Dashboard() {
                 <p><span className="font-medium">Current CI Level:</span> CI-{user?.ciLevel || 0}</p>
                 <p><span className="font-medium">Goal:</span> CI-{user?.targetCi || 8}</p>
                 
-                <Link href="#profile">
-                  <Button variant="outline" size="sm" className="mt-2">
-                    View Profile <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="mt-2"
+                  onClick={() => navigateTo('profile')}
+                >
+                  View Profile <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
               </div>
             )}
           </CardContent>
@@ -46,26 +63,32 @@ export default function Dashboard() {
             <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
             
             <div className="space-y-3">
-              <Link href="#tracking">
-                <Button className="w-full justify-start" variant="outline">
-                  <Calendar className="mr-2 h-4 w-4" />
-                  Log today's tracking
-                </Button>
-              </Link>
+              <Button 
+                className="w-full justify-start" 
+                variant="outline"
+                onClick={() => navigateTo('tracking')}
+              >
+                <Calendar className="mr-2 h-4 w-4" />
+                Log today's tracking
+              </Button>
               
-              <Link href="#photos">
-                <Button className="w-full justify-start" variant="outline">
-                  <ImageIcon className="mr-2 h-4 w-4" />
-                  Upload progress photo
-                </Button>
-              </Link>
+              <Button 
+                className="w-full justify-start" 
+                variant="outline"
+                onClick={() => navigateTo('photos')}
+              >
+                <ImageIcon className="mr-2 h-4 w-4" />
+                Upload progress photo
+              </Button>
               
-              <Link href="#analysis">
-                <Button className="w-full justify-start" variant="outline">
-                  <BarChart3 className="mr-2 h-4 w-4" />
-                  View progress analytics
-                </Button>
-              </Link>
+              <Button 
+                className="w-full justify-start" 
+                variant="outline"
+                onClick={() => navigateTo('analysis')}
+              >
+                <BarChart3 className="mr-2 h-4 w-4" />
+                View progress analytics
+              </Button>
             </div>
           </CardContent>
         </Card>
