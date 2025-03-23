@@ -13,6 +13,7 @@ export default function Tracking() {
     queryKey: ['/api/user/1']
   });
   
+  // Fetch all tracking entries for this user, but only once (not per day)
   const { data: entries, isLoading: isLoadingEntries } = useQuery({
     queryKey: ['/api/tracking/1']
   });

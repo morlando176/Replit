@@ -56,7 +56,7 @@ export default function EntryForm({
   const { toast } = useToast();
   const formattedDate = format(date, 'yyyy-MM-dd');
   
-  // Fetch existing entry for this date
+  // Fetch existing entry for this date, but only when it's actually selected
   const { 
     data: existingEntry, 
     isLoading, 
@@ -64,7 +64,9 @@ export default function EntryForm({
   } = useQuery({
     queryKey: [`/api/tracking/${userId}/${formattedDate}`],
     // If API returns 404, just return null instead of throwing
-    retry: false
+    retry: false,
+    enabled: !!formattedDate, // Only run the query when we have a date
+    staleTime: 0 // Consider data stale immediately so it refetches when date changes
   });
   
   const createOrUpdateEntry = useMutation({
