@@ -20,7 +20,8 @@ export default function Dashboard() {
   
   // Function to handle navigation
   const navigateTo = (path: string) => {
-    // Get the window's hash router
+    console.log(`Dashboard navigation: ${path}`);
+    // Use the browser's location hash which is monitored by App.tsx
     window.location.hash = path;
   };
 

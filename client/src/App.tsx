@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -20,12 +20,40 @@ function App() {
   
   console.log('Current page state:', currentPage);
   
+  // Effect to listen for hash changes
+  useEffect(() => {
+    // Function to handle hash changes
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        const cleanPage = hash.replace('#', '');
+        console.log('Hash changed to:', cleanPage);
+        setCurrentPage(cleanPage);
+      }
+    };
+    
+    // Initial check for hash
+    if (window.location.hash) {
+      handleHashChange();
+    }
+    
+    // Add event listener
+    window.addEventListener('hashchange', handleHashChange);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, []);
+  
   // Function to handle navigation
   const handleNavigation = (page: string) => {
     console.log('Navigation requested to:', page);
     // Remove hash if present
     const cleanPage = page.replace('#', '');
     setCurrentPage(cleanPage);
+    // Update URL hash
+    window.location.hash = cleanPage;
   };
 
   // Render the current page based on state
