@@ -52,6 +52,8 @@ export default function Profile() {
   
   const updateUser = useMutation({
     mutationFn: async (data: ProfileFormValues) => {
+      console.log('Updating user with data:', data);
+      
       const formattedData = {
         ...data,
         age: parseInt(data.age),
@@ -61,6 +63,7 @@ export default function Profile() {
         tension: parseInt(data.tension),
       };
       
+      console.log('Formatted data:', formattedData);
       return apiRequest('POST', '/api/user/1', formattedData);
     },
     onSuccess: () => {
@@ -71,6 +74,7 @@ export default function Profile() {
       });
     },
     onError: (error) => {
+      console.error('Error updating profile:', error);
       toast({
         title: "Error",
         description: "Failed to update profile. Please try again.",
