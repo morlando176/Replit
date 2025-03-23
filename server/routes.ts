@@ -214,6 +214,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     res.json({ success: true });
   });
+  
+  // Endpoint to delete a tracking entry
+  app.delete("/api/tracking/:id", async (req, res) => {
+    const entryId = parseInt(req.params.id);
+    const success = await storage.deleteTrackingEntry(entryId);
+    
+    if (!success) {
+      return res.status(404).json({ message: "Entry not found" });
+    }
+    
+    res.json({ success: true });
+  });
 
   // Serve uploaded files
   app.get("/uploads/:filename", (req, res) => {

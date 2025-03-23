@@ -72,12 +72,19 @@ export default function TrackingCalendar({
   
   // Get status dot color for a date
   const getStatusDot = (date: Date) => {
+    // If not the current month, don't show any indicator
     if (!isSameMonth(date, currentMonth)) return null;
     
+    // Find entry for this date
     const entry = findEntryForDate(date);
-    if (!entry) return "bg-neutral-200"; // Rest day
     
+    // If no entry exists, don't show any indicator
+    if (!entry) return null;
+    
+    // If entry exists with hours worn, show active indicator
     if (entry.hoursWorn > 0) return "bg-secondary-400"; // Method applied
+    
+    // If entry exists but no hours worn, show rest day
     return "bg-neutral-200"; // Rest day
   };
   

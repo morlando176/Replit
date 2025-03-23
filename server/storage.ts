@@ -19,9 +19,10 @@ export interface IStorage {
   
   // Tracking methods
   getTrackingEntries(userId: number): Promise<TrackingEntry[]>;
-  getTrackingEntryByDate(userId: number, date: Date): Promise<TrackingEntry | undefined>;
+  getTrackingEntryByDate(userId: number, date: string | Date): Promise<TrackingEntry | undefined>;
   createTrackingEntry(entry: InsertTrackingEntry): Promise<TrackingEntry>;
   updateTrackingEntry(id: number, entry: Partial<TrackingEntry>): Promise<TrackingEntry | undefined>;
+  deleteTrackingEntry(id: number): Promise<boolean>;
   
   // Photo methods
   getPhotos(userId: number): Promise<Photo[]>;
@@ -142,6 +143,10 @@ export class MemStorage implements IStorage {
     const updatedEntry = { ...entry, ...entryData };
     this.trackingEntries.set(id, updatedEntry);
     return updatedEntry;
+  }
+  
+  async deleteTrackingEntry(id: number): Promise<boolean> {
+    return this.trackingEntries.delete(id);
   }
 
   // Photo methods
