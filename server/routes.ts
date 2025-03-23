@@ -77,10 +77,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const userId = parseInt(req.params.id);
     const userData = req.body;
     
+    console.log('Received user update request for ID:', userId);
+    console.log('User data:', userData);
+    
     const user = await storage.updateUser(userId, userData);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+    
+    console.log('User updated successfully:', user);
     
     // Don't return the password
     const { password, ...userWithoutPassword } = user;

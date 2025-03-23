@@ -75,7 +75,14 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
-    const user: User = { ...insertUser, id };
+    
+    // Handle the date conversion
+    let userCopy = { ...insertUser };
+    if (typeof userCopy.startDate === 'string') {
+      userCopy.startDate = userCopy.startDate;
+    }
+    
+    const user: User = { ...userCopy, id };
     this.users.set(id, user);
     return user;
   }
@@ -84,7 +91,16 @@ export class MemStorage implements IStorage {
     const user = this.users.get(id);
     if (!user) return undefined;
     
-    const updatedUser = { ...user, ...userData };
+    // Handle null fields by setting them to explicit null values
+    const processedData: Partial<User> = {};
+    
+    for (const [key, value] of Object.entries(userData)) {
+      processedData[key as keyof User] = value === undefined ? null : value;
+    }
+    
+    console.log('Updating user with processed data:', processedData);
+    
+    const updatedUser = { ...user, ...processedData };
     this.users.set(id, updatedUser);
     return updatedUser;
   }

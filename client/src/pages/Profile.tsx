@@ -54,6 +54,12 @@ export default function Profile() {
     mutationFn: async (data: ProfileFormValues) => {
       console.log('Updating user with data:', data);
       
+      // Format date field to ISO string if it exists
+      let startDate = data.startDate;
+      if (startDate) {
+        startDate = new Date(startDate).toISOString();
+      }
+      
       const formattedData = {
         ...data,
         age: parseInt(data.age),
@@ -61,6 +67,7 @@ export default function Profile() {
         startingCi: parseInt(data.startingCi),
         targetCi: parseInt(data.targetCi),
         tension: parseInt(data.tension),
+        startDate,
       };
       
       console.log('Formatted data:', formattedData);
@@ -118,6 +125,7 @@ export default function Profile() {
   }, [user, form]);
 
   function onSubmit(data: ProfileFormValues) {
+    console.log('Form submitted with data:', data);
     updateUser.mutate(data);
   }
 
@@ -403,13 +411,15 @@ export default function Profile() {
                 </div>
               </div>
               
-              <Button 
-                type="submit" 
-                className="px-4 py-2 bg-primary-600"
-                disabled={updateUser.isPending}
-              >
-                {updateUser.isPending ? "Saving..." : "Save Profile"}
-              </Button>
+              <div className="mt-6 pb-2">
+                <Button 
+                  type="submit" 
+                  className="w-full md:w-auto px-6 py-3 text-lg font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-md"
+                  disabled={updateUser.isPending}
+                >
+                  {updateUser.isPending ? "Saving..." : "Save Profile"}
+                </Button>
+              </div>
             </form>
           </Form>
         </CardContent>
