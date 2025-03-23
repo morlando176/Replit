@@ -71,9 +71,13 @@ export default function EntryForm({
   
   const createOrUpdateEntry = useMutation({
     mutationFn: async (data: TrackingFormValues) => {
+      // Ensure date is in YYYY-MM-DD format without time component
+      const normalizedDate = formattedDate.split('T')[0];
+      console.log(`Submitting entry for date: ${normalizedDate}`);
+      
       const formattedData = {
         userId,
-        date: formattedDate,
+        date: normalizedDate,
         methodUsed: data.methodUsed,
         hoursWorn: parseInt(data.hoursWorn),
         tensionUsed: parseInt(data.tensionUsed),
@@ -82,9 +86,13 @@ export default function EntryForm({
         day: daysSinceStart
       };
       
+      console.log('Submitting data:', formattedData);
+      
       if (existingEntry) {
+        console.log(`Updating existing entry with ID: ${existingEntry.id}`);
         return apiRequest('PUT', `/api/tracking/${existingEntry.id}`, formattedData);
       } else {
+        console.log('Creating new entry');
         return apiRequest('POST', '/api/tracking', formattedData);
       }
     },

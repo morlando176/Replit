@@ -56,14 +56,23 @@ export default function TrackingCalendar({
   // Helper to find entry for a specific date
   const findEntryForDate = (date: Date) => {
     const dateString = format(date, 'yyyy-MM-dd');
-    // Log entries for debugging
-    console.log('Looking for entry on date:', dateString, 'in entries:', entries);
+    console.log('Looking for entry on date:', dateString);
     
+    // First try to find an exact match using the formatted date string
     const entry = entries.find(entry => {
-      const entryDate = new Date(entry.date);
-      const formattedEntryDate = format(entryDate, 'yyyy-MM-dd');
-      console.log('Comparing dates:', formattedEntryDate, dateString, formattedEntryDate === dateString);
-      return formattedEntryDate === dateString;
+      // Handle both string and Date objects for entry.date
+      const entryDate = typeof entry.date === 'string' 
+        ? entry.date 
+        : new Date(entry.date);
+      
+      // Format the entry date to ensure consistent comparison
+      const formattedEntryDate = typeof entryDate === 'string'
+        ? entryDate.split('T')[0] // Handle ISO string format
+        : format(new Date(entryDate), 'yyyy-MM-dd');
+      
+      const isMatch = formattedEntryDate === dateString;
+      console.log('Comparing dates:', formattedEntryDate, dateString, isMatch);
+      return isMatch;
     });
     
     console.log('Found entry:', entry);

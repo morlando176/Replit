@@ -7,7 +7,21 @@ import WeeklySummary from "@/components/tracking/WeeklySummary";
 import { Card, CardContent } from "@/components/ui/card";
 
 export default function Tracking() {
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  // Initialize with current date, but ensure it's normalized (no time component)
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0); // Remove time component
+    return now;
+  });
+  
+  // Handler for date selection that ensures consistent date format
+  const handleDateSelect = (date: Date) => {
+    // Normalize the date by removing time component
+    const normalizedDate = new Date(date);
+    normalizedDate.setHours(0, 0, 0, 0);
+    console.log(`Selected date (normalized): ${normalizedDate.toISOString()}`);
+    setSelectedDate(normalizedDate);
+  };
   
   const { data: user } = useQuery({
     queryKey: ['/api/user/1']
@@ -34,7 +48,7 @@ export default function Tracking() {
           <TrackingCalendar 
             entries={entries || []} 
             selectedDate={selectedDate}
-            onDateSelect={setSelectedDate}
+            onDateSelect={handleDateSelect}
             isLoading={isLoadingEntries}
           />
           

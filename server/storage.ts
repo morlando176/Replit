@@ -114,13 +114,25 @@ export class MemStorage implements IStorage {
   }
 
   async getTrackingEntryByDate(userId: number, date: string | Date): Promise<TrackingEntry | undefined> {
+    // Normalize the input date to YYYY-MM-DD format
     const dateStr = typeof date === 'string' ? date : date.toISOString().split('T')[0];
+    console.log(`Looking for entry on date: ${dateStr} for user: ${userId}`);
     
-    return Array.from(this.trackingEntries.values())
+    // Find the entry with matching userId and date
+    const entry = Array.from(this.trackingEntries.values())
       .find(entry => {
-        const entryDateStr = typeof entry.date === 'string' ? entry.date : new Date(entry.date).toISOString().split('T')[0];
-        return entry.userId === userId && entryDateStr === dateStr;
+        // Normalize the entry date to YYYY-MM-DD format
+        const entryDateStr = typeof entry.date === 'string' 
+          ? entry.date.split('T')[0] // Handle ISO string format
+          : new Date(entry.date).toISOString().split('T')[0];
+        
+        const isMatch = entry.userId === userId && entryDateStr === dateStr;
+        console.log(`Comparing entry date: ${entryDateStr} with requested date: ${dateStr}, isMatch: ${isMatch}`);
+        return isMatch;
       });
+    
+    console.log(`Found entry:`, entry);
+    return entry;
   }
 
   async createTrackingEntry(entry: InsertTrackingEntry): Promise<TrackingEntry> {

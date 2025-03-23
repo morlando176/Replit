@@ -120,29 +120,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const entryData = insertTrackingEntrySchema.parse(req.body);
     console.log('Creating/updating tracking entry with data:', entryData);
     
+    // Ensure date is in YYYY-MM-DD format
+    const dateStr = typeof entryData.date === 'string' 
+      ? entryData.date.split('T')[0] 
+      : new Date(entryData.date).toISOString().split('T')[0];
+    
+    console.log(`Normalized date for entry: ${dateStr}`);
+    
     // Check if entry already exists for this date before creating a new one
-    // Just pass the date string directly instead of creating a new Date object
     const existingEntry = await storage.getTrackingEntryByDate(
       entryData.userId,
-      entryData.date
+      dateStr
     );
     
     if (existingEntry) {
       console.log('Found existing entry for this date, updating:', existingEntry);
       // Update existing entry instead of creating a new one
-      const updated = await storage.updateTrackingEntry(existingEntry.id, entryData);
+      const updated = await storage.updateTrackingEntry(existingEntry.id, {
+        ...entryData,
+        date: dateStr // Ensure we use the normalized date
+      });
       return res.json(updated);
     }
     
     console.log('No existing entry found, creating new one');
     // Create new entry only if one doesn't exist for this date
-    const entry = await storage.createTrackingEntry(entryData);
+    const entry = await storage.createTrackingEntry({
+      ...entryData,
+      date: dateStr // Ensure we use the normalized date
+    });
     res.status(201).json(entry);
   }));
 
   app.put("/api/tracking/:id", handleErrors(async (req, res) => {
     const entryId = parseInt(req.params.id);
     const entryData = req.body;
+    
+    // Ensure date is in YYYY-MM-DD format if present
+    if (entryData.date) {
+      const dateStr = typeof entryData.date === 'string' 
+        ? entryData.date.split('T')[0] 
+        : new Date(entryData.date).toISOString().split('T')[0];
+      
+      console.log(`Normalized date for update: ${dateStr}`);
+      entryData.date = dateStr;
+    }
+    
+    console.log(`Updating entry ${entryId} with data:`, entryData);
     
     const entry = await storage.updateTrackingEntry(entryId, entryData);
     if (!entry) {
@@ -179,11 +203,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     try {
+      // Normalize date to YYYY-MM-DD format
+      const dateStr = req.body.date 
+        ? (typeof req.body.date === 'string' 
+            ? req.body.date.split('T')[0] 
+            : new Date(req.body.date).toISOString().split('T')[0])
+        : new Date().toISOString().split('T')[0];
+      
+      console.log(`Normalized date for photo: ${dateStr}`);
+      
       // Convert form data to appropriate types
       const photoData = insertPhotoSchema.parse({
         ...req.body,
         userId: parseInt(req.body.userId),
-        date: req.body.date || new Date().toISOString(),
+        date: dateStr,
         filename: req.file.filename,
         ciLevel: req.body.ciLevel ? parseInt(req.body.ciLevel) : null,
         day: req.body.day ? parseInt(req.body.day) : null,
