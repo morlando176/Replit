@@ -102,16 +102,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/tracking/:userId/:date", async (req, res) => {
     const userId = parseInt(req.params.userId);
     const dateStr = req.params.date;
-    const date = new Date(dateStr);
     
-    console.log('GET tracking entry by date:', dateStr, 'parsed as:', date.toISOString());
-    
-    if (isNaN(date.getTime())) {
-      return res.status(400).json({ message: "Invalid date format" });
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      return res.status(400).json({ message: "Invalid date format. Use YYYY-MM-DD" });
     }
     
     const entry = await storage.getTrackingEntryByDate(userId, dateStr);
-    console.log('Found entry:', entry);
     
     if (!entry) {
       return res.status(404).json({ message: "Entry not found" });
