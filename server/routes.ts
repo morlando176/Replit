@@ -122,19 +122,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/tracking", handleErrors(async (req, res) => {
     const entryData = insertTrackingEntrySchema.parse(req.body);
+    console.log('Creating/updating tracking entry with data:', entryData);
     
     // Check if entry already exists for this date before creating a new one
+    // Just pass the date string directly instead of creating a new Date object
     const existingEntry = await storage.getTrackingEntryByDate(
       entryData.userId,
-      new Date(entryData.date)
+      entryData.date
     );
     
     if (existingEntry) {
+      console.log('Found existing entry for this date, updating:', existingEntry);
       // Update existing entry instead of creating a new one
       const updated = await storage.updateTrackingEntry(existingEntry.id, entryData);
       return res.json(updated);
     }
     
+    console.log('No existing entry found, creating new one');
     // Create new entry only if one doesn't exist for this date
     const entry = await storage.createTrackingEntry(entryData);
     res.status(201).json(entry);
